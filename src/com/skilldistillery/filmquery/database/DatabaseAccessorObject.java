@@ -35,7 +35,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		ResultSet rs = stmt.executeQuery();
 		Film f = null;
 		if (rs.equals(null)) {
-			return f;
+			return null;
 		}
 		while (rs.next()) {
 //			System.out.println(rs.getString("id") + " " + rs.getString("title") + " " + rs.getString("description")
@@ -56,6 +56,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			String special_features = rs.getString("special_features");
 			f = new Film(id, title, description, release_year, language_id, rental_duration, rental_rate, length,
 					replacement_cost, rating, special_features);
+			f.setActors(findActorsByFilmId(filmId));
 		}
 		rs.close();
 		stmt.close();
@@ -65,23 +66,17 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 
 	@Override
 	public Actor findActorById(int actorId) throws SQLException {
-		// TODO Auto-generated method stub
 		Connection conn = DriverManager.getConnection(URL, user, pass);
 		String sql = "SELECT * FROM actor WHERE actor.id = ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
-		stmt.setInt(1, actorId);     
+		stmt.setInt(1, actorId);
 		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		Actor a = null;
 		if (rs.equals(null)) {
-			return a;
+			return null;
 		}
 		while (rs.next()) {
-//			System.out.println(rs.getString("id") + " " + rs.getString("title") + " " + rs.getString("description")
-//					+ " " + rs.getString("release_year") + " " + rs.getString("language_id") + " "
-//					+ rs.getString("rental_duration") + " " + rs.getString("rental_rate") + " " + rs.getString("length")
-//					+ " " + rs.getString("replacement_cost") + " " + rs.getString("rating") + " "
-//					+ rs.getString("special_features"));
 			int id = rs.getInt("id");
 			String first_name = rs.getString("first_name");
 			String last_name = rs.getString("last_name");
@@ -94,9 +89,24 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	}
 
 	@Override
-	public List<Actor> findActorsByFilmId(int filmId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Actor> findActorsByFilmId(int filmId) throws SQLException {
+		Connection conn = DriverManager.getConnection(URL, user, pass);
+		String sql = "SELECT film.title, actor.first_name, actor.last_name "
+				+ "FROM film JOIN film_actor ON film.id = film_actor.film_id"
+				+ " JOIN actor ON film_actor.actor_id = actor.id " + "WHERE film.id = ?";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, filmId);
+		System.out.println(stmt);
+		ResultSet rs = stmt.executeQuery();
+		if (rs.equals(null)) {
+			return null;
+		}
+		while (rs.next()) {
+			System.out.println(
+					rs.getString("title") + " " + rs.getString("first_name") + " " + rs.getString("last_name"));
+			// code here to add rs iteration actor instance to a list of Actor objects
+		}
+		return null; // return the list if not null
 	}
 
 }

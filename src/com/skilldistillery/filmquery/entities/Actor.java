@@ -6,6 +6,8 @@ public class Actor {
 	private String lastName;
 	
 	
+	public Actor() { }
+	
 	public Actor(int id, String firstName, String lastName) {
 		super();
 		this.id = id;

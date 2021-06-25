@@ -1,6 +1,7 @@
 package com.skilldistillery.filmquery.entities;
 
 import java.sql.Date;
+import java.util.List;
 
 public class Film {
 	private int id;
@@ -13,9 +14,13 @@ public class Film {
 	private int length;
 	private double replacement_cost;
 	private String rating;
+
 	private String special_features;
+	private List<Actor> actors;
 	
 		
+	public Film() { }
+	
 	public Film(int id, String title, String description, Date release_year, int language_id, int rental_duration,
 			double rental_rate, int length, double replacement_cost, String rating, String special_features) {
 		super();
@@ -98,6 +103,13 @@ public class Film {
 	}
 	public void setSpecial_features(String special_features) {
 		this.special_features = special_features;
+	}
+	public List<Actor> getActors() {
+		return actors;
+	}
+	
+	public void setActors(List<Actor> actors) {
+		this.actors = actors;
 	}
 
 	@Override
