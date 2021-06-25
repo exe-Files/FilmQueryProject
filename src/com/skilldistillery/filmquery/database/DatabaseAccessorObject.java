@@ -109,4 +109,28 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		return null; // return the list if not null
 	}
 
+	@Override
+	public Film findFilmByKeyword(String keyWord) throws SQLException {
+		Connection conn = DriverManager.getConnection(URL, user, pass);
+		String sql = "SELECT * FROM film WHERE film.title LIKE ? OR film.description LIKE ?";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.setString(1, "%" + keyWord + "%");
+		stmt.setString(2, "%" + keyWord + "%");
+		System.out.println(stmt);
+		ResultSet rs = stmt.executeQuery();
+		if (rs.equals(null)) {
+			System.out.println("Invalid");
+			return null;
+		}
+		while (rs.next()) {
+			System.out.println(
+					rs.getString("title") + " " 
+				  + rs.getString("release_year") + " " 
+				  + rs.getString("rating") + " "
+				  + rs.getString("description"));
+				  
+		}
+		return null;
+	}
+
 }

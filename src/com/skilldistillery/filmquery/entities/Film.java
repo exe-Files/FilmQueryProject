@@ -185,11 +185,6 @@ public class Film {
 				+ rental_rate + ", length=" + length + ", replacement_cost=" + replacement_cost + ", rating=" + rating
 				+ ", special_features=" + special_features + "]";
 	}
-	
-	
-	
-
-	
 
 
 }
