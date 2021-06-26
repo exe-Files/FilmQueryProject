@@ -9,6 +9,7 @@ public class Film {
 	private String description;
 	private Date release_year;
 	private int language_id;
+	private String language_name;
 	private int rental_duration;
 	private double rental_rate;
 	private int length;
@@ -110,6 +111,12 @@ public class Film {
 	
 	public void setActors(List<Actor> actors) {
 		this.actors = actors;
+	}
+	public String getLanguage_name() {
+		return language_name;
+	}
+	public void setLanguage_name(String language_name) {
+		this.language_name = language_name;
 	}
 
 	@Override

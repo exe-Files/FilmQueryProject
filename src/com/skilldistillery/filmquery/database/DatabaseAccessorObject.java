@@ -29,7 +29,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	@Override
 	public Film findFilmById(int filmId) throws SQLException {
 		Connection conn = DriverManager.getConnection(URL, user, pass);
-		String sql = "SELECT * FROM film WHERE film.id = ?";
+		String sql = "SELECT *, language.name 'language' FROM film JOIN language ON film.language_id = language.id WHERE film.id = ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, filmId);
 //		System.out.println(stmt);
@@ -53,6 +53,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			// instantiates a new instance of Film based on the constructor
 			f = new Film(id, title, description, release_year, language_id, rental_duration, rental_rate, length,
 					replacement_cost, rating, special_features);
+			f.setLanguage_name(rs.getString("language"));
 			f.setActors(findActorsByFilmId(filmId));
 		}
 		rs.close();
@@ -64,7 +65,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	@Override
 	public List<Film> findFilmByKeyword(String keyWord) throws SQLException {
 		Connection conn = DriverManager.getConnection(URL, user, pass);
-		String sql = "SELECT * FROM film WHERE film.title LIKE ? OR film.description LIKE ?";
+		String sql = "SELECT *,language.name 'language_name' FROM film JOIN language ON film.language_id = language.id WHERE film.title LIKE ? OR film.description LIKE ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.setString(1, "%" + keyWord + "%");
 		stmt.setString(2, "%" + keyWord + "%");
@@ -96,7 +97,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		film.setRating(rs.getString("rating"));
 		film.setSpecial_features(rs.getString("special_features"));
 		film.setActors(findActorsByFilmId(rs.getInt("id")));
-		film.setLanguage_id(0);
+		film.setLanguage_name(rs.getString("language_name"));
 		return film;
 
 	}

@@ -39,8 +39,7 @@ public class FilmQueryApp {
 		System.out.println("3. Exit the application.");
 		// try catch block here
 		int uI = input.nextInt();
-		System.out.println("You entered " + uI);
-		
+
 		switch (uI) {
 		case 1:
 			lookUpFilmByID(input);
@@ -49,6 +48,7 @@ public class FilmQueryApp {
 			lookUpFilmByKeyword(input);
 			break;
 		case 3:
+			System.out.println("Thank you, come again.");
 			break;
 		default:
 
@@ -61,8 +61,7 @@ public class FilmQueryApp {
 		Film film = db.findFilmById(input.nextInt());
 		try {
 			displayFilm(film);
-		}
-		catch(NullPointerException e) {
+		} catch (NullPointerException e) {
 			System.out.println("No results, please try again.");
 		}
 	}
@@ -70,26 +69,25 @@ public class FilmQueryApp {
 	private void lookUpFilmByKeyword(Scanner input) throws SQLException {
 		System.out.println("Please enter the search term for the film are looking for: ");
 		List<Film> film = db.findFilmByKeyword(input.next());
-		if (film.equals(null)){
+		if (film.equals(null)) {
 			System.out.println("No results");
-		}
-		else {
-			for(Film f: film){
+		} else {
+			for (Film f : film) {
 				displayFilm(f);
 			}
-			
 		}
 	}
 
-	private void displayFilm (Film film) {
-		System.out.println("\n"+ film.getTitle());
+	private void displayFilm(Film film) {
+		System.out.println("\n" + film.getTitle());
+		System.out.println("Language: " + film.getLanguage_name());
 		System.out.println("Released on " + film.getRelease_year());
 		System.out.println(film.getRating() + " Rating");
 		System.out.println(film.getDescription());
 		System.out.println("Starring the cast of: ");
-		for(Actor a : film.getActors()) {
-			System.out.println("- "+ a.getFirstName() + " " + a.getLastName());
+		for (Actor a : film.getActors()) {
+			System.out.println("- " + a.getFirstName() + " " + a.getLastName());
 		}
 	}
-	
+
 }
