@@ -59,14 +59,35 @@ public class FilmQueryApp {
 	private void lookUpFilmByID(Scanner input) throws SQLException {
 		System.out.println("Please enter the film ID you would like to search for: ");
 		Film film = db.findFilmById(input.nextInt());
-		System.out.println(film);
+		try {
+			displayFilm(film);
+		}
+		catch(NullPointerException e) {
+			System.out.println("No results, please try again.");
+		}
 	}
 
 	private void lookUpFilmByKeyword(Scanner input) throws SQLException {
 		System.out.println("Please enter the search term for the film are looking for: ");
 		Film film = db.findFilmByKeyword(input.next());
-		System.out.println(film);
-
+		if (film.equals(null)){
+			System.out.println("No results");
+		}
+		else {
+			displayFilm(film);
+			
+		}
 	}
 
+	private void displayFilm (Film film) {
+		System.out.println("\n"+ film.getTitle());
+		System.out.println("Released on " + film.getRelease_year());
+		System.out.println(film.getRating() + " Rating");
+		System.out.println(film.getDescription());
+		System.out.println("Starring the cast of: ");
+		for(Actor a : film.getActors()) {
+			System.out.println("- "+ a.getFirstName() + " " + a.getLastName());
+		}
+	}
+	
 }

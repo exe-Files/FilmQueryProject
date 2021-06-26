@@ -16,4 +16,4 @@ public interface DatabaseAccessor {
 	public Film findFilmByKeyword(String keyWord) throws SQLException;
 }
 
-//interfaces define the signature, but not the how, the body
+//interfaces define the signature, but not the body

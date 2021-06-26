@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.skilldistillery.filmquery.entities.Actor;
@@ -31,18 +32,13 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		String sql = "SELECT * FROM film WHERE film.id = ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, filmId);
-		System.out.println(stmt);
+//		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		Film f = null;
 		if (rs.equals(null)) {
 			return null;
 		}
 		while (rs.next()) {
-//			System.out.println(rs.getString("id") + " " + rs.getString("title") + " " + rs.getString("description")
-//					+ " " + rs.getString("release_year") + " " + rs.getString("language_id") + " "
-//					+ rs.getString("rental_duration") + " " + rs.getString("rental_rate") + " " + rs.getString("length")
-//					+ " " + rs.getString("replacement_cost") + " " + rs.getString("rating") + " "
-//					+ rs.getString("special_features"));
 			int id = rs.getInt("id");
 			String title = rs.getString("title");
 			String description = rs.getString("description");
@@ -54,6 +50,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			double replacement_cost = rs.getDouble("replacement_cost");
 			String rating = rs.getString("rating");
 			String special_features = rs.getString("special_features");
+			// instantiates a new instance of Film based on the constructor
 			f = new Film(id, title, description, release_year, language_id, rental_duration, rental_rate, length,
 					replacement_cost, rating, special_features);
 			f.setActors(findActorsByFilmId(filmId));
@@ -65,12 +62,51 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	}
 
 	@Override
+	public Film findFilmByKeyword(String keyWord) throws SQLException {
+		Connection conn = DriverManager.getConnection(URL, user, pass);
+		String sql = "SELECT * FROM film WHERE film.title LIKE ? OR film.description LIKE ?";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.setString(1, "%" + keyWord + "%");
+		stmt.setString(2, "%" + keyWord + "%");
+//		System.out.println(stmt);
+		ResultSet rs = stmt.executeQuery();
+		if (rs.equals(null)) {
+			System.out.println("Invalid Query");
+			return null;
+		}
+		Film film = null;
+		while (rs.next()) {
+			film = parseResultSet(rs);
+			
+		}
+		return film; //returns one film object
+	}
+
+	public Film parseResultSet(ResultSet rs) throws SQLException {
+		Film film = new Film();
+		film.setId(rs.getInt("id"));
+		film.setTitle(rs.getString("title"));
+		film.setDescription(rs.getString("description"));
+		film.setRelease_year(rs.getDate("release_year"));
+		film.setLanguage_id(rs.getInt("language_id"));
+		film.setRental_duration(rs.getInt("rental_duration"));
+		film.setRental_rate(rs.getDouble("rental_rate"));
+		film.setLength(rs.getInt("length"));
+		film.setReplacement_cost(rs.getDouble("replacement_cost"));
+		film.setRating(rs.getString("rating"));
+		film.setSpecial_features(rs.getString("special_features"));
+		film.setActors(findActorsByFilmId(rs.getInt("id")));
+		film.setLanguage_id(0);
+		return film;
+
+	}
+
+	@Override
 	public Actor findActorById(int actorId) throws SQLException {
 		Connection conn = DriverManager.getConnection(URL, user, pass);
 		String sql = "SELECT * FROM actor WHERE actor.id = ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, actorId);
-		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		Actor a = null;
 		if (rs.equals(null)) {
@@ -91,46 +127,23 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 	@Override
 	public List<Actor> findActorsByFilmId(int filmId) throws SQLException {
 		Connection conn = DriverManager.getConnection(URL, user, pass);
-		String sql = "SELECT film.title, actor.first_name, actor.last_name "
+		String sql = "SELECT film.title, actor.id, actor.first_name, actor.last_name "
 				+ "FROM film JOIN film_actor ON film.id = film_actor.film_id"
 				+ " JOIN actor ON film_actor.actor_id = actor.id " + "WHERE film.id = ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, filmId);
-		System.out.println(stmt);
+//		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		if (rs.equals(null)) {
 			return null;
 		}
+		List<Actor> actorList = new ArrayList<Actor>();
 		while (rs.next()) {
-			System.out.println(
-					rs.getString("title") + " " + rs.getString("first_name") + " " + rs.getString("last_name"));
-			// code here to add rs iteration actor instance to a list of Actor objects
+			actorList.add(findActorById(rs.getInt("id"))); // should cycle through rs actors and add to the list
+//			System.out.println(
+//					rs.getString("title") + " " + rs.getString("first_name") + " " + rs.getString("last_name"));
 		}
-		return null; // return the list if not null
-	}
-
-	@Override
-	public Film findFilmByKeyword(String keyWord) throws SQLException {
-		Connection conn = DriverManager.getConnection(URL, user, pass);
-		String sql = "SELECT * FROM film WHERE film.title LIKE ? OR film.description LIKE ?";
-		PreparedStatement stmt = conn.prepareStatement(sql);
-		stmt.setString(1, "%" + keyWord + "%");
-		stmt.setString(2, "%" + keyWord + "%");
-		System.out.println(stmt);
-		ResultSet rs = stmt.executeQuery();
-		if (rs.equals(null)) {
-			System.out.println("Invalid");
-			return null;
-		}
-		while (rs.next()) {
-			System.out.println(
-					rs.getString("title") + " " 
-				  + rs.getString("release_year") + " " 
-				  + rs.getString("rating") + " "
-				  + rs.getString("description"));
-				  
-		}
-		return null;
+		return actorList;
 	}
 
 }
