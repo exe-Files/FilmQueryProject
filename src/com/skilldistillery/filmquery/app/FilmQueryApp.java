@@ -1,6 +1,6 @@
 package com.skilldistillery.filmquery.app;
 
-import java.awt.List;
+import java.util.List;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -69,12 +69,14 @@ public class FilmQueryApp {
 
 	private void lookUpFilmByKeyword(Scanner input) throws SQLException {
 		System.out.println("Please enter the search term for the film are looking for: ");
-		Film film = db.findFilmByKeyword(input.next());
+		List<Film> film = db.findFilmByKeyword(input.next());
 		if (film.equals(null)){
 			System.out.println("No results");
 		}
 		else {
-			displayFilm(film);
+			for(Film f: film){
+				displayFilm(f);
+			}
 			
 		}
 	}

@@ -13,7 +13,7 @@ public interface DatabaseAccessor {
 
 	public List<Actor> findActorsByFilmId(int filmId) throws SQLException;
 	
-	public Film findFilmByKeyword(String keyWord) throws SQLException;
+	public List<Film> findFilmByKeyword(String keyWord) throws SQLException;
 }
 
 //interfaces define the signature, but not the body

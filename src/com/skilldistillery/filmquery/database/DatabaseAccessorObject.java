@@ -58,11 +58,11 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		rs.close();
 		stmt.close();
 		conn.close();
-		return f;
+		return f; //returns ONE film object based on the Film ID
 	}
 
 	@Override
-	public Film findFilmByKeyword(String keyWord) throws SQLException {
+	public List<Film> findFilmByKeyword(String keyWord) throws SQLException {
 		Connection conn = DriverManager.getConnection(URL, user, pass);
 		String sql = "SELECT * FROM film WHERE film.title LIKE ? OR film.description LIKE ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
@@ -74,12 +74,12 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			System.out.println("Invalid Query");
 			return null;
 		}
-		Film film = null;
+		List<Film> films = new ArrayList<Film>();
 		while (rs.next()) {
-			film = parseResultSet(rs);
-			
+			Film film = parseResultSet(rs);
+			films.add(film);
 		}
-		return film; //returns one film object
+		return films; //returns a List of film objects
 	}
 
 	public Film parseResultSet(ResultSet rs) throws SQLException {
