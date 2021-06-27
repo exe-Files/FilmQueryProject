@@ -35,31 +35,32 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 //		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		Film f = null;
-		if (rs.equals(null)) {
+		if (rs.next() == false) {
 			return null;
-		}
-		while (rs.next()) {
-			int id = rs.getInt("id");
-			String title = rs.getString("title");
-			String description = rs.getString("description");
-			Date release_year = rs.getDate("release_year");
-			int language_id = rs.getInt("language_id");
-			int rental_duration = rs.getInt("rental_duration");
-			double rental_rate = rs.getDouble("rental_rate");
-			int length = rs.getInt("length");
-			double replacement_cost = rs.getDouble("replacement_cost");
-			String rating = rs.getString("rating");
-			String special_features = rs.getString("special_features");
-			// instantiates a new instance of Film based on the constructor
-			f = new Film(id, title, description, release_year, language_id, rental_duration, rental_rate, length,
-					replacement_cost, rating, special_features);
-			f.setLanguage_name(rs.getString("language"));
-			f.setActors(findActorsByFilmId(filmId));
+		} else {
+			do {
+				int id = rs.getInt("id");
+				String title = rs.getString("title");
+				String description = rs.getString("description");
+				Date release_year = rs.getDate("release_year");
+				int language_id = rs.getInt("language_id");
+				int rental_duration = rs.getInt("rental_duration");
+				double rental_rate = rs.getDouble("rental_rate");
+				int length = rs.getInt("length");
+				double replacement_cost = rs.getDouble("replacement_cost");
+				String rating = rs.getString("rating");
+				String special_features = rs.getString("special_features");
+				// instantiates a new instance of Film based on the constructor
+				f = new Film(id, title, description, release_year, language_id, rental_duration, rental_rate, length,
+						replacement_cost, rating, special_features);
+				f.setLanguage_name(rs.getString("language"));
+				f.setActors(findActorsByFilmId(filmId));
+			} while (rs.next());
 		}
 		rs.close();
 		stmt.close();
 		conn.close();
-		return f; //returns ONE film object based on the Film ID
+		return f; // returns ONE film object based on the Film ID
 	}
 
 	@Override
@@ -69,18 +70,17 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.setString(1, "%" + keyWord + "%");
 		stmt.setString(2, "%" + keyWord + "%");
-//		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
-		if (rs.equals(null)) {
-			System.out.println("Invalid Query");
-			return null;
-		}
 		List<Film> films = new ArrayList<Film>();
-		while (rs.next()) {
-			Film film = parseResultSet(rs);
-			films.add(film);
+		if (rs.next() == false) {
+			return null;
+		} else {
+			do {
+				Film film = parseResultSet(rs);
+				films.add(film);
+			} while (rs.next());
 		}
-		return films; //returns a List of film objects
+		return films; // returns a List of film objects
 	}
 
 	public Film parseResultSet(ResultSet rs) throws SQLException {
@@ -99,7 +99,6 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		film.setActors(findActorsByFilmId(rs.getInt("id")));
 		film.setLanguage_name(rs.getString("language_name"));
 		return film;
-
 	}
 
 	@Override
@@ -133,7 +132,6 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				+ " JOIN actor ON film_actor.actor_id = actor.id " + "WHERE film.id = ?";
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, filmId);
-//		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		if (rs.equals(null)) {
 			return null;
